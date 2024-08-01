@@ -1,3 +1,3 @@
-# bubblesort
+# BubbleSort
 
-A description of this project.
+Simple CLI bubble sort implementation
