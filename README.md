@@ -15,6 +15,6 @@ Simple CLI app with different sorting algorithm implementations I made
   #### 3. Run meson
       meson setup ./build
   #### 4. Run ninja
-      ninja -C ./buiild
-  #### 5. Run the program
-      ./build/src/toxicSortingAlgorithms
+      ninja -C ./build
+  #### 5. Run the program (will change soon)
+      ./build/src/bubblesort
