@@ -1,4 +1,4 @@
-{
+git {
     "id" : "com.toxicstoxm.simpleBubbleSort",
     "runtime" : "org.freedesktop.Platform",
     "runtime-version" : "23.08",

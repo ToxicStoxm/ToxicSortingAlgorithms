@@ -85,10 +85,10 @@ using namespace std;
 #define QUICKSORT "quicksort"
 #define MERGESORT "mergesort"
 
-#define LENGTH 2000000
-#define MAX 10
+#define LENGTH 158
+#define MAX 148
 #define SORTING_ALGORITHM QUICKSORT
-#define VISUAL_SORT false
+#define VISUAL_SORT true
 #define SLOW_FACTOR_MILLISECONDS 0
 
 int max(vector<vector<bool>> *matrix) {
@@ -117,7 +117,7 @@ void rotate(vector<vector<bool>> *matrix) {
 }
 
 void pushPixels(vector<vector<bool>> matrix) {
-  //cout << "\033[H";
+  cout << "\033[H";
   cout.flush();
 
   unsigned int matrixSize = matrix.size();
@@ -158,6 +158,7 @@ void printList(vector<int> *list) {
 
   rotate(&diagram);
   pushPixels(diagram);
+  cout.flush();
 }
 
 void BubbleSort(vector<int> *list) {
@@ -204,6 +205,8 @@ int Partition(vector<int> *list, int low, int high) {
 }
 
 void QuickSort(vector<int> *list, int low, int high) {
+  if (VISUAL_SORT) printList(list);
+  if (SLOW_FACTOR_MILLISECONDS > 0) usleep(SLOW_FACTOR_MILLISECONDS);
   if (low < high) {
     int pivot_location = Partition(list, low, high);
     QuickSort(list, low, pivot_location);
