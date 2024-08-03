@@ -9,12 +9,12 @@ Simple CLI app with different sorting algorithm implementations I made
   - opencv4
 ### Building:
   #### 1. Clone this repositry
-      git clone https://github.com/ToxicStoxm/BubbleSort/
+      git clone https://github.com/ToxicStoxm/ToxicSortingAlgorithms/
   #### 2. Cd into the project root
-      cd BubbleSort
+      cd ToxicSortingAlgorithms
   #### 3. Run meson
       meson setup ./build
   #### 4. Run ninja
       ninja -C ./buiild
   #### 5. Run the program
-      ./build/src/bubblesort
+      ./build/src/toxicSortingAlgorithms
