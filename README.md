@@ -1,6 +1,6 @@
-# SortingAlgorithms
+# ToxicSortingAlgorithms
 
-Simple CLI application with different sorting algorithm implementations  
+Simple CLI app with different sorting algorithm implementations I made  
   _Currently implemented: BubbleSort, QuickSort, MergeSort_
 
 ## Using the software
