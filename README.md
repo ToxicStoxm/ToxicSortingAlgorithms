@@ -1,6 +1,7 @@
-# BubbleSort
+# SortingAlgorithms
 
-Simple CLI bubble sort implementation
+Simple CLI application with different sorting algorithm implementations  
+  _Currently implemented: BubbleSort, QuickSort, MergeSort_
 
 ## Using the software
 ### Requirements:
