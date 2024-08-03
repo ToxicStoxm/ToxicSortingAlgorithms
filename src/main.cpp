@@ -2,6 +2,8 @@
 #include <vector>
 #include <unistd.h>
 #include <random>
+#include <chrono>
+#include <time.h>
 
 using namespace std;
 
@@ -79,8 +81,15 @@ using namespace std;
 #define CRESET "\e[0m"
 #define COLOR_RESET "\e[0m"
 
-#define LENGTH 50
-#define MAX 200
+#define BUBBLESORT "bubblesort"
+#define QUICKSORT "quicksort"
+#define MERGESORT "mergesort"
+
+#define LENGTH 2000000
+#define MAX 10
+#define SORTING_ALGORITHM QUICKSORT
+#define VISUAL_SORT false
+#define SLOW_FACTOR_MILLISECONDS 0
 
 int max(vector<vector<bool>> *matrix) {
   int temp = -2147483648;
@@ -108,9 +117,7 @@ void rotate(vector<vector<bool>> *matrix) {
 }
 
 void pushPixels(vector<vector<bool>> matrix) {
-  rotate(&matrix);
-
-  cout << "\033[H";
+  //cout << "\033[H";
   cout.flush();
 
   unsigned int matrixSize = matrix.size();
@@ -134,14 +141,6 @@ int max(vector<int> *list) {
 }
 
 void printList(vector<int> *list) {
-  /*cout << "Current List: [";
-  for (unsigned int i = 0; i < list->size(); i++) {
-    cout << list->at(i);
-    if (i != list->size() - 1) cout << ", ";
-    cout.flush();
-  }
-  cout << "]" << endl;*/
-
   vector<vector<bool>> diagram;
   vector<bool> def;
   vector<bool> temp;
@@ -157,10 +156,11 @@ void printList(vector<int> *list) {
     diagram.push_back(def);
   }
 
+  rotate(&diagram);
   pushPixels(diagram);
 }
 
-void sort(vector<int> *list) {
+void BubbleSort(vector<int> *list) {
   int factor = 0;
   int j;
   int k;
@@ -174,12 +174,88 @@ void sort(vector<int> *list) {
           list->at(i) = k;
         }
       }
-
-      //usleep(100);
-      printList(list);
+      if (SLOW_FACTOR_MILLISECONDS > 0) usleep(SLOW_FACTOR_MILLISECONDS);
+      if (VISUAL_SORT) printList(list);
 	  }
 	  factor++;
 	}
+}
+
+void swap (vector<int> *list, int i, int j) {
+  auto temp = list->at(j);
+  list->at(j) = list->at(i);
+  list->at(i) = temp;
+}
+
+int Partition(vector<int> *list, int low, int high) {
+  auto pivot = list->at(low);
+  int leftwall = low;
+
+  for (int i = low + 1; i < high; i++) {
+    if (list->at(i) < pivot) {
+      swap(list->at(i), list->at(leftwall));
+      leftwall++;
+    }
+  }
+
+  swap(pivot, list->at(leftwall));
+
+  return leftwall;
+}
+
+void QuickSort(vector<int> *list, int low, int high) {
+  if (low < high) {
+    int pivot_location = Partition(list, low, high);
+    QuickSort(list, low, pivot_location);
+    QuickSort(list, pivot_location + 1, high);
+  }
+}
+
+vector<int> subVector(vector<int> list, int begin, int end) {
+  vector<int> temp;
+  for (int i = begin; i < end; i++) {
+    temp.push_back(list.at(i));
+  }
+
+  return temp;
+}
+
+vector<int> merge(vector<int> arrayOne, vector<int> arrayTwo) {
+  vector<int> arrayFinal;
+
+  while (arrayOne.size() > 0 && arrayTwo.size() > 0) {
+    if (arrayOne.at(0) > arrayTwo.at(0)) {
+      arrayFinal.push_back(arrayTwo.at(0));
+      arrayTwo.erase(arrayTwo.begin());
+    } else {
+      arrayFinal.push_back(arrayOne.at(0));
+      arrayOne.erase(arrayOne.begin());
+    }
+  }
+
+  while (arrayOne.size() > 0) {
+     arrayFinal.push_back(arrayOne.at(0));
+     arrayOne.erase(arrayOne.begin());
+  }
+
+  while (arrayTwo.size() > 0) {
+    arrayFinal.push_back(arrayTwo.at(0));
+    arrayTwo.erase(arrayTwo.begin());
+  }
+
+  return arrayFinal;
+}
+
+vector<int> MergeSort(vector<int> list) {
+  if (list.size() <= 1) return list;
+
+  vector<int> arrayOne = subVector(list, 0, list.size()/2);
+  vector<int> arrayTwo = subVector(list, list.size()/2 + 1, list.size() - 1);
+
+  arrayOne = MergeSort(arrayOne);
+  arrayTwo = MergeSort(arrayTwo);
+
+  return merge(arrayOne, arrayTwo);
 }
 
 void generateRandomList(int length, int maxVal, vector<int> *base) {
@@ -191,21 +267,66 @@ void generateRandomList(int length, int maxVal, vector<int> *base) {
   for (int i = 0; i < length; i++) {
     base->push_back(distr(gen));
   }
-
-  cout << "Current List: [";
-  for (unsigned int i = 0; i < base->size(); i++) {
-    cout << base->at(i);
-    if (i != base->size() - 1) cout << ", ";
-    cout.flush();
-  }
-  cout << "]" << endl;
 }
+
+constexpr unsigned int str2int(const char* str, int h = 0)
+{
+    return !str[h] ? 5381 : (str2int(str, h+1) * 33) ^ str[h];
+}
+
+template <
+    class result_t   = chrono::microseconds,
+    class clock_t    = chrono::high_resolution_clock,
+    class duration_t = chrono::microseconds
+>
+
+auto since(chrono::time_point<clock_t, duration_t> const& start)
+{
+    return chrono::duration_cast<result_t>(clock_t::now() - start);
+}
+
 
 int main() {
   vector<int> list;
+  cout << "Generating random list with " << LENGTH << " elements. Min value: 0 | Max value: " << MAX << endl;
   generateRandomList(LENGTH, MAX, &list);
 
-	sort(&list);
+  cout << "Unsorted list: " << endl << endl;
+  if (LENGTH < 1000 && MAX < 1000) printList(&list);
 
+  cout << endl << "Sorting list using " << SORTING_ALGORITHM << (VISUAL_SORT ? ":" : "") << endl;
+  auto start = chrono::high_resolution_clock::now();
+  switch (str2int(SORTING_ALGORITHM)) {
+    case str2int(BUBBLESORT):
+      BubbleSort(&list);
+      break;
+    case str2int(QUICKSORT):
+      QuickSort(&list, 0, list.size());
+      break;
+    case str2int(MERGESORT):
+      list = MergeSort(list);
+    break;
+  }
+
+  auto timeElapsed = since(start).count();
+
+	cout << "Finished sorting list!" << endl;
+	cout << "Sorted list:" << endl << endl;
+  if (LENGTH < 1000 && MAX < 1000) printList(&list);
+
+	cout << endl << "Statistics: " << endl;
+	cout << "- Sorting algorithm: " << SORTING_ALGORITHM << endl;
+	cout << "- List:" << endl;
+	cout << "  - Length: " << LENGTH << endl;
+	cout << "  - Min: " << "0" << endl;
+	cout << "  - Max: " << MAX << endl;
+
+	if (timeElapsed >= 1000) {
+	  cout << "- Time elapsed(ms): " << (double) timeElapsed / 1000 << endl;
+	} else {
+	  cout << "- Time elapsed(µs): " << timeElapsed << endl;
+	}
+
+cout.flush();
 	return 0;
 }
